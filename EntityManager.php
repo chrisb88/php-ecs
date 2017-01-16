@@ -1,0 +1,85 @@
+<?php
+
+namespace ecs;
+
+use ecs\events\EventManager;
+use ecs\events\messages\EntityCreatedMessage;
+use ecs\events\messages\EntityDestroyedMessage;
+
+require_once('EventManager.php');
+require_once('Entity.php');
+require_once('messages/EntityCreatedMessage.php');
+require_once('messages/EntityDestroyedMessage.php');
+
+class EntityManager
+{
+    /**
+     * @var EventManager
+     */
+    private $eventManager;
+
+    /**
+     * @var Entity[]
+     */
+    private $entities;
+
+    /**
+     * @var int
+     */
+    private $entityCount = 0;
+
+    /**
+     * @var int[]
+     */
+    private $entityFreeIds;
+
+    /**
+     * @param EventManager $eventManager
+     */
+    public function __construct(EventManager &$eventManager) {
+        $this->entities = [];
+        $this->entityFreeIds = [];
+        $this->eventManager = $eventManager;
+    }
+
+    /**
+     * @return Entity
+     */
+    public function createEntity() {
+        if (count($this->entityFreeIds)) {
+            $id = array_shift($this->entityFreeIds);
+        } else {
+            $id = ++$this->entityCount;
+        }
+        $entity = new Entity($this, $id);
+        $this->entities[$id] = $entity;
+        $this->eventManager->emit(new EntityCreatedMessage($entity));
+
+        return $entity;
+    }
+
+    /**
+     * @param int $id Entity ID
+     * @return Entity
+     * @throws \Exception
+     */
+    public function getEntity($id) {
+        if (isset($this->entities[$id])) {
+            return $this->entities[$id];
+        }
+
+        throw new \Exception(sprintf('Entity with ID "%s" not found.', $id));
+    }
+
+    /**
+     * @param int $id Entity ID
+     * @throws \Exception
+     */
+    public function destroyEntity($id) {
+        $entity = $this->getEntity($id);
+        $entity->destroy();
+        unset($this->entities[$id]);
+        $this->entityFreeIds[] = $id;
+        $this->eventManager->emit(new EntityDestroyedMessage($entity));
+    }
+}
