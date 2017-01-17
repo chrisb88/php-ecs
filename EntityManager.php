@@ -81,6 +81,21 @@ class EntityManager
         return $entities;
     }
 
+    public function getEntitiesByAnyComponent($classNames) {
+        if (is_string($classNames)) {
+            $classNames = [$classNames];
+        }
+
+        $entities = [];
+        foreach ($this->entities as $entity) {
+            if ($entity->hasAnyComponent($classNames)) {
+                $entities[] = $entity;
+            }
+        }
+
+        return $entities;
+    }
+
     /**
      * @param int $id Entity ID
      * @throws \Exception

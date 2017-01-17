@@ -46,7 +46,7 @@ class EventManager
     }
 
     public function unsubscribe() {
-
+        throw new \Exception("Not implemented.");
     }
 
     /**

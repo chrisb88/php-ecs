@@ -12,8 +12,8 @@ class RenderSystem extends System implements SystemInterface
     }
 
     public function update() {
-//        $entities = $this->entityManager->getEntitiesByAllComponents(Description::class);
-//        var_dump($entities);
+        $entities = $this->entityManager->getEntitiesByAnyComponent(Description::class);
+        var_dump($entities);
 
         $entities = $this->entityManager->getEntitiesByAllComponents([Description::class, Name::class]);
         var_dump($entities);

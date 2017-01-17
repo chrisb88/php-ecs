@@ -20,12 +20,18 @@ class Entity
     private $components;
 
     /**
+     * @var string[]
+     */
+    private $componentClassNames;
+
+    /**
      * @param EntityManager $entityManager
      * @param int $id
      */
     public function __construct(EntityManager $entityManager, $id) {
         $this->id = $id;
         $this->components = [];
+        $this->componentClassNames = [];
         $this->entityManager = $entityManager;
     }
 
@@ -45,28 +51,28 @@ class Entity
 
     /**
      * @param Component $component
+     * @return $this
      */
     public function addComponent(Component $component) {
         $this->components[] = $component;
+        $className = get_class($component);
+        if (!in_array($className, $this->componentClassNames)) {
+            $this->componentClassNames[] = $className;
+        }
+
+        return $this;
     }
 
     public function removeComponent() {
-
+        throw new \Exception("Not implemented.");
     }
 
     /**
      * @param string $className
      * @return bool
-     * @todo refactor so we don't need to iterate over all components und get it's class
      */
     public function hasComponent($className) {
-        foreach ($this->components as $component) {
-            if (get_class($component) == $className) {
-                return true;
-            }
-        }
-
-        return false;
+        return in_array($className, $this->componentClassNames);
     }
 
     /**
