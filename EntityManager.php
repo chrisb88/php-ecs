@@ -31,7 +31,7 @@ class EntityManager
     /**
      * @param EventManager $eventManager
      */
-    public function __construct(EventManager &$eventManager) {
+    public function __construct(EventManager $eventManager) {
         $this->entities = [];
         $this->entityFreeIds = [];
         $this->eventManager = $eventManager;
@@ -60,6 +60,25 @@ class EntityManager
         }
 
         throw new \Exception(sprintf('Entity with ID "%s" not found.', $id));
+    }
+
+    /**
+     * @param string|string[] $classNames
+     * @return Entity[]
+     */
+    public function getEntitiesByAllComponents($classNames) {
+        if (is_string($classNames)) {
+            $classNames = [$classNames];
+        }
+
+        $entities = [];
+        foreach ($this->entities as $entity) {
+            if ($entity->hasAllComponents($classNames)) {
+                $entities[] = $entity;
+            }
+        }
+
+        return $entities;
     }
 
     /**

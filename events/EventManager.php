@@ -30,6 +30,7 @@ class EventManager
     /**
      * @param Receiver $receiver
      * @param string $messageClass
+     * @return $this
      */
     public function subscribe(Receiver $receiver, $messageClass) {
         $id = $this->fetchNewId();
@@ -40,6 +41,8 @@ class EventManager
         }
 
         $this->messageListeners[$messageClass][] = $id;
+
+        return $this;
     }
 
     public function unsubscribe() {
