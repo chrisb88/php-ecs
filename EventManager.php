@@ -9,7 +9,7 @@ class EventManager
     /**
      * @var int
      */
-    private $receiverCount = 0;
+    private static $receiverCount = 0;
 
     /**
      * @var Receiver[]
@@ -32,7 +32,7 @@ class EventManager
      * @param string $messageClass
      */
     public function subscribe(Receiver $receiver, $messageClass) {
-        $id = ++$this->receiverCount;
+        $id = $this->fetchNewId();
         $this->receivers[$id] = $receiver;
 
         if (!isset($this->messageListeners[$messageClass])) {
@@ -69,5 +69,9 @@ class EventManager
         }
 
         throw new \Exception(sprintf('Receiver with ID "%s" not found.', $id));
+    }
+
+    private function fetchNewId() {
+        return ++static::$receiverCount;
     }
 }

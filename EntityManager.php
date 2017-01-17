@@ -14,6 +14,11 @@ require_once('messages/EntityDestroyedMessage.php');
 class EntityManager
 {
     /**
+     * @var int
+     */
+    private static $entityCount = 0;
+
+    /**
      * @var EventManager
      */
     private $eventManager;
@@ -22,11 +27,6 @@ class EntityManager
      * @var Entity[]
      */
     private $entities;
-
-    /**
-     * @var int
-     */
-    private $entityCount = 0;
 
     /**
      * @var int[]
@@ -46,11 +46,7 @@ class EntityManager
      * @return Entity
      */
     public function createEntity() {
-        if (count($this->entityFreeIds)) {
-            $id = array_shift($this->entityFreeIds);
-        } else {
-            $id = ++$this->entityCount;
-        }
+        $id = $this->fetchNewId();
         $entity = new Entity($this, $id);
         $this->entities[$id] = $entity;
         $this->eventManager->emit(new EntityCreatedMessage($entity));
@@ -81,5 +77,18 @@ class EntityManager
         unset($this->entities[$id]);
         $this->entityFreeIds[] = $id;
         $this->eventManager->emit(new EntityDestroyedMessage($entity));
+    }
+
+    /**
+     * @return int
+     */
+    private function fetchNewId() {
+        if (count($this->entityFreeIds)) {
+            $id = array_shift($this->entityFreeIds);
+        } else {
+            $id = ++static::$entityCount;
+        }
+
+        return $id;
     }
 }
