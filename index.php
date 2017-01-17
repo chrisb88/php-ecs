@@ -1,10 +1,6 @@
 <?php
 
-require_once('EntityManager.php');
-require_once('EventManager.php');
-require_once('components/Description.php');
-require_once('messages/EntityCreatedMessage.php');
-require_once('events/Receiver.php');
+require_once('Autoloader.php');
 
 use ecs\components\Description;
 use ecs\events\messages\EntityCreatedMessage;

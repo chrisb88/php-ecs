@@ -6,11 +6,6 @@ use ecs\events\EventManager;
 use ecs\events\messages\EntityCreatedMessage;
 use ecs\events\messages\EntityDestroyedMessage;
 
-require_once('EventManager.php');
-require_once('Entity.php');
-require_once('messages/EntityCreatedMessage.php');
-require_once('messages/EntityDestroyedMessage.php');
-
 class EntityManager
 {
     /**

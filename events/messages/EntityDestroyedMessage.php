@@ -4,8 +4,6 @@ namespace ecs\events\messages;
 
 use ecs\Entity;
 
-require_once('events/Message.php');
-
 class EntityDestroyedMessage extends Message
 {
     /**
