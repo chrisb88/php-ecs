@@ -20,18 +20,12 @@ class Entity
     private $components;
 
     /**
-     * @var string[]
-     */
-    private $componentClassNames;
-
-    /**
      * @param EntityManager $entityManager
      * @param int $id
      */
     public function __construct(EntityManager $entityManager, $id) {
         $this->id = $id;
         $this->components = [];
-        $this->componentClassNames = [];
         $this->entityManager = $entityManager;
     }
 
@@ -52,13 +46,15 @@ class Entity
     /**
      * @param Component $component
      * @return $this
+     * @throws \Exception
      */
     public function addComponent(Component $component) {
-        $this->components[] = $component;
-        $className = get_class($component);
-        if (!in_array($className, $this->componentClassNames)) {
-            $this->componentClassNames[] = $className;
+        $id = get_class($component);
+        if (isset($this->components[$id])) {
+            throw new \Exception(sprintf('Component "%s" is already registered.', $id));
         }
+
+        $this->components[$id] = $component;
 
         return $this;
     }
@@ -72,7 +68,7 @@ class Entity
      * @return bool
      */
     public function hasComponent($className) {
-        return in_array($className, $this->componentClassNames);
+        return isset($this->components[$className]);
     }
 
     /**

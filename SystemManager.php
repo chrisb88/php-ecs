@@ -58,7 +58,7 @@ class SystemManager
     public function addSystem(SystemInterface $system) {
         $id = get_class($system);
         if (isset($this->systems[$id])) {
-            throw new \Exception(sprintf('System "%s" already registered.', $id));
+            throw new \Exception(sprintf('System "%s" is already registered.', $id));
         }
 
         $this->systems[$id] = $system;
