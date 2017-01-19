@@ -59,6 +59,19 @@ class Entity
         return $this;
     }
 
+    /**
+     * @param string $className
+     * @return Component
+     * @throws \Exception
+     */
+    public function getComponent($className) {
+        if (isset($this->components[$className])) {
+            return $this->components[$className];
+        }
+
+        throw new \Exception(sprintf('Component "%s" is not registered.', $className));
+    }
+
     public function removeComponent() {
         throw new \Exception("Not implemented.");
     }

@@ -94,10 +94,12 @@ class Ecs
 
     /**
      * @param SystemInterface $system
+     * @param int $priority
      * @return $this
+     * @throws \Exception
      */
-    public function addSystem(SystemInterface $system) {
-        $this->systemManager->addSystem($system);
+    public function addSystem(SystemInterface $system, $priority = 0) {
+        $this->systemManager->addSystem($system, $priority);
 
         return $this;
     }

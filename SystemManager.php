@@ -24,11 +24,17 @@ class SystemManager
     private $systems;
 
     /**
+     * @var int[]
+     */
+    private $priorities;
+
+    /**
      * @param EventManager $eventManager
      * @param EntityManager $entityManager
      */
     public function __construct(EventManager $eventManager, EntityManager $entityManager) {
         $this->systems = [];
+        $this->priorities = [];
         $this->eventManager = $eventManager;
         $this->entityManager = $entityManager;
     }
@@ -37,8 +43,9 @@ class SystemManager
      * Updates all systems.
      */
     public function update() {
-        foreach ($this->systems as $system) {
-            $system->update();
+        var_dump($this->priorities);
+        foreach ($this->priorities as $className => $priority) {
+            $this->getSystem($className)->update();
         }
     }
 
@@ -52,16 +59,20 @@ class SystemManager
 
     /**
      * @param SystemInterface $system
+     * @param int $priority
      * @return $this
      * @throws \Exception if the system was already added
      */
-    public function addSystem(SystemInterface $system) {
+    public function addSystem(SystemInterface $system, $priority = 0) {
         $id = get_class($system);
         if (isset($this->systems[$id])) {
             throw new \Exception(sprintf('System "%s" is already registered.', $id));
         }
 
         $this->systems[$id] = $system;
+        $this->priorities[$id] = (int) $priority;
+        asort($this->priorities);
+
         $this->eventManager->emit(new SystemAddedMessage($system));
 
         return $this;
