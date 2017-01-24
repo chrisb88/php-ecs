@@ -25,6 +25,7 @@ class SystemManager
 
     /**
      * @var int[]
+     * @todo maybe better use @see http://php.net/manual/de/class.splheap.php for priorities?
      */
     private $priorities;
 
@@ -43,7 +44,7 @@ class SystemManager
      * Updates all systems.
      */
     public function update() {
-        var_dump($this->priorities);
+//        var_dump($this->priorities);
         foreach ($this->priorities as $className => $priority) {
             $this->getSystem($className)->update();
         }

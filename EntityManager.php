@@ -42,7 +42,7 @@ class EntityManager
      */
     public function createEntity() {
         $id = $this->fetchNewId();
-        $entity = new Entity($this, $id);
+        $entity = new Entity($this, $this->eventManager, $id);
         $this->entities[$id] = $entity;
         $this->eventManager->emit(new EntityCreatedMessage($entity));
 

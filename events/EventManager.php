@@ -3,6 +3,7 @@
 namespace ecs\events;
 
 use ecs\events\messages\Message;
+use ecs\systems\System;
 
 class EventManager
 {
@@ -22,9 +23,15 @@ class EventManager
      */
     private $messageListeners;
 
+    /**
+     * @var System[]
+     */
+    private $mailboxes;
+
     public function __construct() {
         $this->receivers = [];
         $this->messageListeners = [];
+        $this->mailboxes = [];
     }
 
     /**
@@ -50,14 +57,33 @@ class EventManager
     }
 
     /**
+     * Subscribes a system to a mailbox of a particular message event.
+     * @param string $className
+     * @param System $system
+     */
+    public function subscribeMbox($className, System $system) {
+        if (!isset($this->mailboxes[$className])) {
+            $this->mailboxes[$className] = [];
+        }
+
+        $this->mailboxes[$className][] = $system;
+    }
+
+    /**
      * @param Message $message
      * @throws \Exception
      */
     public function emit(Message $message) {
-        $type = get_class($message);
-        $listener = (isset($this->messageListeners[$type])) ? $this->messageListeners[$type] : [];
+        $className = get_class($message);
+        $listener = (isset($this->messageListeners[$className])) ? $this->messageListeners[$className] : [];
         foreach ($listener as $receiverId) {
             $this->getReceiver($receiverId)->receive($message);
+        }
+
+        /* @var System[] $systems */
+        $systems = (isset($this->mailboxes[$className])) ? $this->mailboxes[$className] : [];
+        foreach ($systems as $system) {
+            $system->receiveMboxMessage($message);
         }
     }
 

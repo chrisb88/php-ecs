@@ -2,6 +2,9 @@
 
 namespace ecs;
 
+use ecs\events\EventManager;
+use ecs\events\messages\ComponentAddedMessage;
+
 class Entity
 {
     /**
@@ -15,18 +18,25 @@ class Entity
     private $entityManager;
 
     /**
+     * @var EventManager
+     */
+    private $eventManager;
+
+    /**
      * @var Component[]
      */
     private $components;
 
     /**
      * @param EntityManager $entityManager
+     * @param EventManager $eventManager
      * @param int $id
      */
-    public function __construct(EntityManager $entityManager, $id) {
+    public function __construct(EntityManager $entityManager, EventManager $eventManager, $id) {
         $this->id = $id;
         $this->components = [];
         $this->entityManager = $entityManager;
+        $this->eventManager = $eventManager;
     }
 
     /**
@@ -55,6 +65,7 @@ class Entity
         }
 
         $this->components[$id] = $component;
+        $this->eventManager->emit(new ComponentAddedMessage($component));
 
         return $this;
     }
