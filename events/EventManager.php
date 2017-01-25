@@ -2,36 +2,25 @@
 
 namespace ecs\events;
 
+use ecs\utils\ArrayMultimap;
 use ecs\events\messages\Message;
 use ecs\systems\System;
 
 class EventManager
 {
     /**
-     * @var int
+     * @var ArrayMultimap
      */
-    private static $receiverCount = 0;
+    private $receiverMap;
 
     /**
-     * @var Receiver[]
+     * @var ArrayMultimap
      */
-    private $receivers;
-
-    /**
-     * Holds receiver IDs grouped by message class IDs
-     * @var string[]
-     */
-    private $messageListeners;
-
-    /**
-     * @var System[]
-     */
-    private $mailboxes;
+    private $mailboxMap;
 
     public function __construct() {
-        $this->receivers = [];
-        $this->messageListeners = [];
-        $this->mailboxes = [];
+        $this->receiverMap = new ArrayMultimap();
+        $this->mailboxMap = new ArrayMultimap();
     }
 
     /**
@@ -40,14 +29,7 @@ class EventManager
      * @return $this
      */
     public function subscribe(Receiver $receiver, $messageClass) {
-        $id = $this->fetchNewId();
-        $this->receivers[$id] = $receiver;
-
-        if (!isset($this->messageListeners[$messageClass])) {
-            $this->messageListeners[$messageClass] = [];
-        }
-
-        $this->messageListeners[$messageClass][] = $id;
+        $this->receiverMap->put($messageClass, $receiver);
 
         return $this;
     }
@@ -62,11 +44,7 @@ class EventManager
      * @param System $system
      */
     public function subscribeMbox($className, System $system) {
-        if (!isset($this->mailboxes[$className])) {
-            $this->mailboxes[$className] = [];
-        }
-
-        $this->mailboxes[$className][] = $system;
+        $this->mailboxMap->put($className, $system);
     }
 
     /**
@@ -75,32 +53,17 @@ class EventManager
      */
     public function emit(Message $message) {
         $className = get_class($message);
-        $listener = (isset($this->messageListeners[$className])) ? $this->messageListeners[$className] : [];
-        foreach ($listener as $receiverId) {
-            $this->getReceiver($receiverId)->receive($message);
+
+        /* @var Receiver[] $listener */
+        $listener = $this->receiverMap->get($className);
+        foreach ($listener as $receiver) {
+            $receiver->receive($message);
         }
 
         /* @var System[] $systems */
-        $systems = (isset($this->mailboxes[$className])) ? $this->mailboxes[$className] : [];
+        $systems = $this->mailboxMap->get($className);
         foreach ($systems as $system) {
             $system->receiveMboxMessage($message);
         }
-    }
-
-    /**
-     * @param $id
-     * @return Receiver
-     * @throws \Exception
-     */
-    private function getReceiver($id) {
-        if (isset($this->receivers[$id])) {
-            return $this->receivers[$id];
-        }
-
-        throw new \Exception(sprintf('Receiver with ID "%s" not found.', $id));
-    }
-
-    private function fetchNewId() {
-        return ++static::$receiverCount;
     }
 }

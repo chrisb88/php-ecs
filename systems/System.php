@@ -7,7 +7,7 @@ use ecs\events\EventManager;
 use ecs\events\messages\Message;
 use SplQueue;
 
-abstract class System
+abstract class System implements SystemInterface
 {
     /**
      * @var EventManager

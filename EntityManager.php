@@ -81,6 +81,10 @@ class EntityManager
         return $entities;
     }
 
+    /**
+     * @param string|string[] $classNames
+     * @return Entity[]
+     */
     public function getEntitiesByAnyComponent($classNames) {
         if (is_string($classNames)) {
             $classNames = [$classNames];

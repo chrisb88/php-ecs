@@ -4,7 +4,7 @@ namespace ecs;
 
 use ecs\events\EventManager;
 use ecs\events\messages\SystemAddedMessage;
-use ecs\systems\SystemInterface;
+use ecs\systems\System;
 
 class SystemManager
 {
@@ -19,7 +19,7 @@ class SystemManager
     private $entityManager;
 
     /**
-     * @var SystemInterface[]
+     * @var System[]
      */
     private $systems;
 
@@ -44,7 +44,6 @@ class SystemManager
      * Updates all systems.
      */
     public function update() {
-//        var_dump($this->priorities);
         foreach ($this->priorities as $className => $priority) {
             $this->getSystem($className)->update();
         }
@@ -52,19 +51,19 @@ class SystemManager
 
     /**
      * @param string $className
-     * @return SystemInterface
+     * @return System
      */
     public function createSystem($className) {
         return new $className($this->eventManager, $this->entityManager);
     }
 
     /**
-     * @param SystemInterface $system
+     * @param System $system
      * @param int $priority
      * @return $this
      * @throws \Exception if the system was already added
      */
-    public function addSystem(SystemInterface $system, $priority = 0) {
+    public function addSystem(System $system, $priority = 0) {
         $id = get_class($system);
         if (isset($this->systems[$id])) {
             throw new \Exception(sprintf('System "%s" is already registered.', $id));
@@ -81,7 +80,7 @@ class SystemManager
 
     /**
      * @param string $className
-     * @return SystemInterface
+     * @return System
      * @throws \Exception
      */
     public function getSystem($className) {
