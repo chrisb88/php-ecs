@@ -37,6 +37,7 @@ class Ecs
      */
     public function update() {
         $this->systemManager->update();
+        $this->eventManager->deliverDeferredMessages();
     }
 
     /**
