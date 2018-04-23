@@ -4,6 +4,7 @@ namespace ecs;
 
 use ecs\events\EventManager;
 use ecs\events\messages\ComponentAddedMessage;
+use ecs\events\messages\ComponentRemovedMessage;
 
 class Entity
 {
@@ -70,6 +71,16 @@ class Entity
         return $this;
     }
 
+    public function addComponentIfNotExist(Component $component)
+    {
+        $id = get_class($component);
+        if (!isset($this->components[$id])) {
+            $this->addComponent($component);
+        }
+
+        return $this;
+    }
+
     /**
      * @param string $className
      * @return Component
@@ -83,8 +94,21 @@ class Entity
         throw new \Exception(sprintf('Component "%s" is not registered.', $className));
     }
 
-    public function removeComponent() {
-        throw new \Exception("Not implemented.");
+    /**
+     * @param string $className
+     * @return $this
+     * @throws \Exception
+     */
+    public function removeComponent($className)
+    {
+        if (isset($this->components[$className])) {
+            unset($this->components[$className]);
+            $this->eventManager->emit(new ComponentRemovedMessage($className, $this));
+
+            return $this;
+        }
+
+        throw new \Exception(sprintf('Component "%s" is not registered.', $className));
     }
 
     /**

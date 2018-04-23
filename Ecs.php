@@ -5,9 +5,15 @@ namespace ecs;
 use ecs\events\EventManager;
 use ecs\events\Receiver;
 use ecs\systems\SystemInterface;
+use Psr\Log\LoggerInterface;
 
 class Ecs
 {
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
     /**
      * @var EntityManager
      */
@@ -25,11 +31,13 @@ class Ecs
 
     /**
      * Constructor
+     * @param LoggerInterface $logger
      */
-    public function __construct() {
+    public function __construct(LoggerInterface $logger = null) {
+        $this->logger = $logger;
         $this->eventManager = new EventManager();
         $this->entityManager = new EntityManager($this->eventManager);
-        $this->systemManager = new SystemManager($this->eventManager, $this->entityManager);
+        $this->systemManager = new SystemManager($this->eventManager, $this->entityManager, $this->logger);
     }
 
     /**

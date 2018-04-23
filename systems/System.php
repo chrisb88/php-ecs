@@ -5,10 +5,16 @@ namespace ecs\systems;
 use ecs\EntityManager;
 use ecs\events\EventManager;
 use ecs\events\messages\Message;
+use Psr\Log\LoggerInterface;
 use SplQueue;
 
 abstract class System implements SystemInterface
 {
+    /**
+     * @var LoggerInterface
+     */
+    protected $logger;
+
     /**
      * @var EventManager
      */
@@ -27,8 +33,10 @@ abstract class System implements SystemInterface
     /**
      * @param EventManager $eventManager
      * @param EntityManager $entityManager
+     * @param LoggerInterface $logger
      */
-    public function __construct(EventManager $eventManager, EntityManager $entityManager) {
+    public function __construct(EventManager $eventManager, EntityManager $entityManager, LoggerInterface $logger = null) {
+        $this->logger = $logger;
         $this->eventManager = $eventManager;
         $this->entityManager = $entityManager;
         $this->mailboxes = [];
